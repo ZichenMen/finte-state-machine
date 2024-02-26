@@ -40,7 +40,7 @@ public class FiniteStateMachine {
     public boolean Execute(String s) {
         Set<Integer> currentStates = new HashSet<>();
         currentStates.add(startState);
-        for (char symbol : s.toCharArray()) {
+        for (char symbol : s.toCharArray()) { // iterate every chars of the string
             Set<Integer> nextStates = new HashSet<>();
             for (int state : currentStates) {
                 Set<Integer> transitions = transitionTable.getOrDefault(state, new HashMap<>()).get(symbol);

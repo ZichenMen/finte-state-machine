@@ -1,27 +1,54 @@
-public class UnitTest {
-    public static void main(String[] args) {
-        FiniteStateMachine fsm = new FiniteStateMachine();
-        fsm.addState(0); // Start state
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class FiniteStateMachineTest {
+
+    private FiniteStateMachine fsm;
+
+    @BeforeEach
+    void setUp() {
+        fsm = new FiniteStateMachine();
+        fsm.addState(0);
         fsm.addState(1);
-        fsm.addFinalState(1); // Final state
-        fsm.setStartState(0);
+        fsm.addState(2);
         fsm.addAlphabet('a');
         fsm.addAlphabet('b');
+        fsm.setStartState(0);
+        fsm.addFinalState(2);
         fsm.addTransition(0, 'a', 1);
-        fsm.addTransition(1, 'b', 0);
+        fsm.addTransition(1, 'b', 2);
+    }
 
-        // Test cases
-        String[] testStrings = {"a", "ab", "aba", "b"};
-        boolean[] expectedResults = {true, false, true, false};
+    @Test
+    void testExecuteAcceptedString() {
+        assertTrue(fsm.Execute("ab"), "FSM should accept the string 'ab'.");
+    }
 
-        // Execute tests
-        for (int i = 0; i < testStrings.length; i++) {
-            boolean result = fsm.Execute(testStrings[i]);
-            if (result == expectedResults[i]) {
-                System.out.println("Test " + (i+1) + " with input \"" + testStrings[i] + "\" passed.");
-            } else {
-                System.out.println("Test " + (i+1) + " with input \"" + testStrings[i] + "\" failed.");
-            }
-        }
+    @Test
+    void testExecuteRejectedString() {
+        assertFalse(fsm.Execute("ba"), "FSM should reject the string 'ba'.");
+    }
+
+    @Test
+    void testPathForAcceptedString() {
+        int[] expectedPath = {0, 1, 2};
+        assertArrayEquals(expectedPath, fsm.Path("ab"), "Path should be 0->1->2 for the string 'ab'.");
+    }
+
+    @Test
+    void testPathForRejectedString() {
+        assertNull(fsm.Path("ba"), "Path should be null for the rejected string 'ba'.");
+    }
+
+    @Test
+    void testIsDFAWithDFAConfiguration() {
+        assertTrue(fsm.IsDFA(), "FSM should be identified as a DFA with the given configuration.");
+    }
+
+    @Test
+    void testIsDFAWithNFAConfiguration() {
+        fsm.addTransition(0, 'a', 2);
+        assertFalse(fsm.IsDFA(), "FSM should not be identified as a DFA after adding an NFA transition.");
     }
 }
